@@ -1,5 +1,5 @@
 # -*- coding:utf8 -*-
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import pymysql
 
 app = Flask(__name__)
@@ -10,7 +10,36 @@ def index():
 
 @app.route('/login',methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'GET':
+        return render_template('login.html')
+    else:
+        #連接數據庫
+        db = pymysql.connect(host='127.0.0.1', user='root', password='9',
+                             db = 'todolist', port=3306)
+
+        cur = db.cursor()
+
+        #sql 查詢
+        username = request.form.get('username')
+        password = request.form.get('password')
+        query_sql = "select * from user where username='"+username+"' and password=''"+password+"'"
+
+        try:
+            cur.execute(query_sql)
+            results = cur.fetchall()
+            print(len(results))
+            if len(results) == 1:
+                return redirect(url_for('index'))
+            else:
+                print('Invalid username or password.')
+            db.commit()
+        except Exception as e:
+            db.rollback()
+        finally:
+            print('close db connection')
+            cur.close()
+            db.close()
+        return render_template('login.html')
 
 #獲取注冊請求並處理數據
 @app.route('/register', methods=['GET', 'POST'])
@@ -31,20 +60,18 @@ def register():
         #插入數據的sql語句,變量插入爲外單引號，內雙綽號
         username = request.form.get('username')
         password = request.form.get('password')
-        sql_insert = "insert into user (`id`, `username`, `password`) values(default, '"+username+"', '"+password+"')"
+        insert_sql = "insert into user (`id`, `username`, `password`) values(default, '"+username+"', '"+password+"')"
 
         try:
-            cur.execute(sql_insert)
+            cur.execute(insert_sql)
             #提交
             db.commit()
         except Exception as e:
             db.rollback()
         finally:
+            cur.close()
             db.close()
         return redirect(url_for('index')) #提交完數據後返回首頁
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
