@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Flask--register</title>
-</head>
-<body>
-        <form method="post" action="/register">
-        <label>username: <input type="text" name="username" value=""></label><br>
-        <label>password:<input type="password" name="password" value=""></label><br>
-        <input type="submit" value="register">
-    </form>
-</body>
-</html>
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %} Todolist-Register {% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1> Register</h1>
+</div>
+{{ wtf.quick_form(form)}}
+{% endblock %}

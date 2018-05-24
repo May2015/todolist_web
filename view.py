@@ -1,8 +1,15 @@
 # -*- coding:utf8 -*-
 from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_bootstrap import Bootstrap
+from form import RegistrationForm
 import pymysql
 
 app = Flask(__name__)
+
+#實例化Bootstrap
+bootstrap = Bootstrap(app)
+#密鈅用於flask-wtf保護表單數據
+app.config['SECRET_KEY'] = 'do not try to guess my string'
 
 @app.route('/')
 def index():
@@ -44,8 +51,9 @@ def login():
 #獲取注冊請求並處理數據
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    form = RegistrationForm()
     if request.method == 'GET':
-        return render_template('register.html')
+        return render_template('register.html', form=form)
     else:
         #將用戶名和密碼加入數據庫
         #手動連接數據庫前，先mysql命令手動建立數據庫與user表
