@@ -1,24 +1,17 @@
 # -*- coding:utf8 -*-
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_bootstrap import Bootstrap
-from form import RegistrationForm
+from flask import render_template, request, redirect, url_for
+from app.auth.form import RegistrationForm
+from . import auth
 import pymysql
 
-app = Flask(__name__)
-
-#實例化Bootstrap
-bootstrap = Bootstrap(app)
-#密鈅用於flask-wtf保護表單數據
-app.config['SECRET_KEY'] = 'do not try to guess my string'
-
-@app.route('/')
+@auth.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('auth/index.html')
 
-@app.route('/login',methods=['GET', 'POST'])
+@auth.route('/login',methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('login.html')
+        return render_template('auth/login.html')
     else:
         #連接數據庫
         db = pymysql.connect(host='127.0.0.1', user='root', password='9',
@@ -46,14 +39,14 @@ def login():
             print('close db connection')
             cur.close()
             db.close()
-        return render_template('login.html')
+        return render_template('auth/login.html')
 
 #獲取注冊請求並處理數據
-@app.route('/register', methods=['GET', 'POST'])
+@auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if request.method == 'GET':
-        return render_template('register.html', form=form)
+        return render_template('auth/register.html', form=form)
     else:
         #將用戶名和密碼加入數據庫
         #手動連接數據庫前，先mysql命令手動建立數據庫與user表
@@ -79,7 +72,6 @@ def register():
         finally:
             cur.close()
             db.close()
-        return redirect(url_for('index')) #提交完數據後返回首頁
+        return redirect(url_for('auth/index')) #提交完數據後返回首頁
 
-if __name__ == '__main__':
-    app.run(debug=True)
+

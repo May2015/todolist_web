@@ -1,12 +1,14 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
+from wtforms import ValidationError
+from app.models import User
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     pass
 
 
-class RegistrationForm(Form):
+class RegistrationForm(FlaskForm):
     '''
     register new user
     '''
@@ -20,7 +22,9 @@ class RegistrationForm(Form):
 
     #make sure email and username don't duplicate
     def validate_email(self, field):
-        pass
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('Email already registered.')
 
     def validate_username(self, field):
-        pass
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('Username already in use.')
