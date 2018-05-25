@@ -1,6 +1,6 @@
 # -*- coding:utf8 -*-
 from flask import render_template, request, redirect, url_for
-from app.auth.form import RegistrationForm
+from app.auth.form import RegistrationForm, LoginForm
 from . import auth
 import pymysql
 
@@ -10,8 +10,9 @@ def index():
 
 @auth.route('/login',methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
     if request.method == 'GET':
-        return render_template('auth/login.html')
+        return render_template('auth/login.html', form=form)
     else:
         #連接數據庫
         db = pymysql.connect(host='127.0.0.1', user='root', password='9',

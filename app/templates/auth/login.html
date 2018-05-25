@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Flask--login</title>
-</head>
-<body>
-    <form method="post" action="/login">
-        <label>username: <input type="text" name="username"></label><br>
-        <label>password:<input type="password" name="password"></label><br>
-        <input type="submit" value="login">
-    </form>
-</body>
-</html>
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %} Todolist-Login {% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1> Login</h1>
+</div>
+{{ wtf.quick_form(form)}}
+{% endblock %}
