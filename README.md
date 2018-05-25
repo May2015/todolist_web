@@ -13,8 +13,6 @@ day2:
 利用藍圖進行程序結構重新組織，爲簡化，config文件沒有獨立出來
 將login register功能加入auth 認證藍圖
 
-此時完成：
-register頁面表格由form實現，bootstrap渲染，加入藍圖後，此頁面正常顯示
-
-下一步：
-login 頁面也由form正常顯示
+此時，登錄認證沒有加入郵件確認，但是可以正常與數據庫交互
+頁面根據登錄狀態選擇性顯示sigin signout
+注冊與登錄功能正常

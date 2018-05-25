@@ -1,7 +1,9 @@
-from . import db
+from . import db, login_manage
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
-class User(db.Model):
+#UserMixin用於支持用戶登錄
+class User(db.Model, UserMixin):
     '''
     record info about username email and password
     '''
@@ -24,6 +26,10 @@ class User(db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-
     def __repr__(self):
         return '<User %r>'%self.username
+
+#用於管理登錄
+@login_manage.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
