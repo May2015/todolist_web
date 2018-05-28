@@ -34,9 +34,9 @@ def register():
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
-        send_email(user.email, 'Confirm Your Account', 'auth/email/confirm', user=user, token=token)
-        print('send emial')
+        send_email(user.email, 'Test', 'auth/email/confirm', user=user, token=token)
         flash("A confirmation email has been sent to you by email.")
+        flash('You can log in.')
         return redirect(url_for('auth.index')) # 提交完數據後返回首頁
     return render_template('auth/register.html', form=form)
 
@@ -60,6 +60,31 @@ def confirm(token):
     else:
         flash('Your confirmation link is invalid or has expired.')
     return redirect(url_for('auth.index'))
+
+# 未確認帳戶想要訪問某些需要權限的頁面，進行攔截
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated \
+        and not current_user.confirmed \
+        and request.endpoint[:5] != 'auth.' \
+        and request.endpoint != 'static':
+        	return redirect(url_for('auth.unconfirmed'))
+
+@auth.route('/unconfirm')
+def unconfirmed():
+    if current_user.is_anonymous or current_user.confirmed:
+        return redirect(url_for('auth.index'))
+    return render_template('auth/unconfirmed.html')
+
+@auth.route('/confirm')
+@login_required
+def resend_confirmation():
+    token = current_user.generate_confirmation_token()
+    send_email(current_user.email, 'Test', 'auth/email/confirm', user=current_user, token=token)
+    flash("A new confirmation email has been sent to you by email.")
+    flash("You can now login.")
+    return redirect(url_for('auth.index'))
+
 
 
 
