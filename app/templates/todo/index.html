@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todolist--index</title>
+</head>
+<body>
+<h1> Todolist things</h1>
+    <table class="table">
+        {% if events %}
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>title</th>
+                <th>category</th>
+                <th>completed</th>
+                <th>create time</th>
+            </tr>
+        </thead>
+        {% endif %}
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td>{{ event.id }}</td>
+                <td>{{ event.title }}</td>
+                <td>{{ event.category }}</td>
+                <td>{% if event.completion %} Y {% else %} N {% endif %}</td>
+                <td>{{ event.create_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
