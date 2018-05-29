@@ -45,8 +45,8 @@ def create_app():
     # 密鈅用於flask-wtf保護表單數據
     app.config['SECRET_KEY'] = 'do not try to guess my string'
 
-    # 實例化
     bootstrap.init_app(app)
+    # 實例化
     # 實例化數據庫
     db.init_app(app)
     # 實例化登錄
@@ -55,9 +55,13 @@ def create_app():
     mail.init_app(app)
 
 
-    #注冊認證藍本
+    # 注冊認證藍本
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+
+    # main藍本處理todolist主體
+    from .todo import todo as todo_blueprint
+    app.register_blueprint(todo_blueprint, url_prefix='/todo')
 
 
     return app

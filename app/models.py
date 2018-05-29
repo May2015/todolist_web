@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
+from datetime import datetime
 
 #UserMixin用於支持用戶登錄
 class User(db.Model, UserMixin):
@@ -17,6 +18,8 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128))
     # 賬戶郵件確認
     confirmed = db.Column(db.Boolean, default=False)
+    # users events 一對多關系表
+    events = db.relationship('Event', backref = 'sponsor', lazy='dynamic')
 
     # 加密令牌用於生成用戶的確認url鏈接
     def generate_confirmation_token(self, expiration=3600):
@@ -56,3 +59,32 @@ class User(db.Model, UserMixin):
 @login_manage.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+class Event(db.Model):
+    __tablename__ = 'events'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64))
+    category = db.Column(db.String(64))
+    completion = db.Column(db.Boolean, default=False)
+    create_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    sponsor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+class Category(db.Model):
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+
+    @staticmethod
+    def insert_categories():
+        cate = ['Study', 'Work', 'Life', 'Plans']
+        for c in cate:
+            category = Category.query.filter_by(name=c).first()
+            if category is None:
+                category = Category(name=c)
+            db.session.add(category)
+        db.session.commit()
+
+
+
+

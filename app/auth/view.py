@@ -19,7 +19,7 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             # 用於登錄管理
             login_user(user, form.remember_me.data)
-            return redirect(url_for('auth.index'))
+            return redirect(url_for('todo.index'))
         flash('Invalid username or password.')
     return render_template('auth/login.html', form=form)
 
