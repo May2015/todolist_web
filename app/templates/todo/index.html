@@ -1,34 +1,107 @@
 <!DOCTYPE html>
+{% extends "base.html" %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Todolist--index</title>
+    <meta name="viewport" content="width=device-width"/>
+    {% block title %} Todolist--index {% endblock %}
+
+    <!--<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>-->
+    <!--<script>
+    window.jQuery || document.write('<script src="../../static/jquery-3.3.1.js"><\/script>');
+    </script>-->
+
+    <!-- @1. Jquery組件作用-->
+    <!--<script src="../../static/jquery-3.3.1.js"></script>-->
+
+    <!-- @2. bootstrap組件使用 -->
+    <!--<script src="../../static/bootstrap-3.3.7-dist/dist/js/bootstrap.js"></script>-->
+
+    <!-- @3. bootstrap table組件用中文包的使用-->
+    <!--<script src="../../static/bootstrap-table-1.12.1/dist/bootstrap-table.js"></script>-->
+    <!--<link href="../../static/bootstrap-table-1.12.1/dist/bootstrap-table.css" rel="stylesheet"/>-->
+    <!--<script src="../../static/bootstrap-table-1.12.1/dist/locale/bootstrap-table-zh-CN.js"></script>-->
+<link href="../../static/bootstrap-3.3.7-dist/dist/css/bootstrap.css" rel="stylesheet"/>
+<link href="../../static/bootstrap-table/dist/bootstrap-table.css" rel="stylesheet"/>
+
+
 </head>
-<body>
-<h1> Todolist things</h1>
-    <table class="table">
-        {% if events %}
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>title</th>
-                <th>category</th>
-                <th>completed</th>
-                <th>create time</th>
-            </tr>
-        </thead>
-        {% endif %}
-        <tbody>
-            {% for event in events %}
-            <tr>
-                <td>{{ event.id }}</td>
-                <td>{{ event.title }}</td>
-                <td>{{ event.category }}</td>
-                <td>{% if event.completion %} Y {% else %} N {% endif %}</td>
-                <td>{{ event.create_time }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+
+{% block page_content %}
+<div style="width: 80%; margin: 0 auto">
+    <h1> Duty List</h1>
+    <table id="table"></table>
+    <a class="btn btn-primary" href="{{ url_for('todo.addEvent') }}" role="button">Add Event</a>
+    <a class="btn btn-primary" href="#" role="button">Add Category</a>
+</div>
+<!-- 覆蓋bootstrap/base.html引入腳本，否則重復引入會出現未定義問題 -->
+{% block scripts %}
+<script src="../../static/jquery-3.3.1.js"></script>
+<script src="../../static/bootstrap-3.3.7-dist/dist/js/bootstrap.js"></script>
+<script src="../../static/bootstrap-table/dist/bootstrap-table.js"></script>
+<script src="../../static/bootstrap-table/dist/locale/bootstrap-table-zh-CN.js"></script>
+{% endblock %}
+<script type="text/javascript">
+$(function(){
+    initTable();
+});
+
+function initTable() {
+    //先銷毀表格
+    $('#table').bootstrapTable('destroy');
+    //初始化表格
+     $('#table').bootstrapTable({
+         url: '{{ url_for("todo.infos")}}',
+         method: 'POST',
+         dataType: 'json',
+         cache: false,
+         striped: true,
+         pagination: true,
+         sidePagination: "server", <!--分页方式：client客户端分页，server服务端分页（*）-->
+         pageNumber: 1, <!--初始化加载第一页，默认第一页 -->
+         pageSize: 10, <!--每页的记录行数（*）-->
+         responseHandler: responseHandler,
+         columns: [{
+            field: 'id',
+            title: '序號',
+            align: 'center',
+            width: '50px'
+         }, {
+            field: 'title',
+            title: '標題',
+            align: 'center'
+         }, {
+            field: 'category',
+            title: '類別',
+            aligin: 'center'
+         }, {
+            field: 'completion',
+            title: '是否完成'
+         }, {
+            field: 'create_time',
+            title: '創建時間'
+         }]
+
+    });
+}
+
+function responseHandler(res){
+    if (res){
+        return {
+            "rows": res.rows,
+            "total": res.total
+        };
+    }
+    else{
+        return {
+            "rows": [],
+            "total": 0
+        };
+    }
+
+}
+</script>
+{% endblock %}
 </body>
 </html>

@@ -70,6 +70,18 @@ class Event(db.Model):
     create_time = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     sponsor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+    # 提供前端頁面所需的數據
+    def to_json(self):
+        json_event = {
+            'id': self.id,
+            'title': self.title,
+            'category': self.category,
+            'completion': self.completion,
+            'create_time': self.create_time
+        }
+        return json_event
+
+
 class Category(db.Model):
     __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
