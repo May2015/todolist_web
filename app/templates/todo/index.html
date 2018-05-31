@@ -33,13 +33,14 @@
     <h1> Duty List</h1>
     <table id="table"></table>
     <a class="btn btn-primary" href="{{ url_for('todo.addEvent') }}" role="button">Add Event</a>
-    <a class="btn btn-primary" href="#" role="button">Add Category</a>
+    <a class="btn btn-primary" href="{{ url_for('todo.addCategory') }}" role="button">Add Category</a>
 </div>
 <!-- 覆蓋bootstrap/base.html引入腳本，否則重復引入會出現未定義問題 -->
 {% block scripts %}
 <script src="../../static/jquery-3.3.1.js"></script>
 <script src="../../static/bootstrap-3.3.7-dist/dist/js/bootstrap.js"></script>
 <script src="../../static/bootstrap-table/dist/bootstrap-table.js"></script>
+<script src="../../static/bootstrap-table/dist/extensions/editable/bootstrap-table-editable.js"></script>
 <script src="../../static/bootstrap-table/dist/locale/bootstrap-table-zh-CN.js"></script>
 {% endblock %}
 <script type="text/javascript">
@@ -76,13 +77,37 @@ function initTable() {
             title: '類別',
             aligin: 'center'
          }, {
-            field: 'completion',
-            title: '是否完成'
+             field: 'completion',
+             title: '是否完成',
          }, {
             field: 'create_time',
             title: '創建時間'
-         }]
-
+         },{
+             field: 'operation',
+             title: '操作',
+             events: operateEvents,  //給按鈕注冊事件
+             formatter: AddFunctionAlty,  //表格中增加按鈕
+         }],
+         onEditableSave: function(field, row, oldvalue, $el){
+             var data= {
+            data: JSON.stringify({
+                 'id': row.id,
+                'complete': row.complete
+            }),
+            };
+            $.ajax({
+                    type: "post",
+                    url: "{{ url_for('todo.status') }}",
+                    data: data,
+                    dataType: 'JSON',
+                    success: function (data) {
+                        initTable();
+                    },
+                    error: function () {
+                        alert('编辑失败');
+                    },
+                    })
+         }
     });
 }
 
@@ -99,6 +124,37 @@ function responseHandler(res){
             "total": 0
         };
     }
+
+}
+
+
+function AddFunctionAlty(value, row, index){
+    return [
+        '<button id="TableDelete" type="button", class="btn btn-default">刪除</button>',
+        '<a id="TableEdit" href="/todo/editEvent?id='+row.id+'" class="btn btn-default" role="button">編輯</a>'
+    ].join("")
+}
+
+
+window.operateEvents = {
+    "click #TableDelete": function(e, value, row, index) {
+        e.preventDefault();
+        var data= {
+            data: JSON.stringify({
+                 'id': row.id
+            }),
+            };
+        $.ajax({
+            url: '{{ url_for("todo.deleteEvent") }}',
+            method: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                initTable();
+            }
+        });
+    },
+
 
 }
 </script>
